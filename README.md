@@ -3,11 +3,23 @@
 [![Snakemake](https://img.shields.io/badge/snakemake-≥6.3.0-brightgreen.svg)](https://snakemake.github.io)
 
 
-This is a brief introduction to workflow management with snakemake aiming at getting you up and running with snakemake on the [Ibex](https://www.hpc.kaust.edu.sa/ibex) cluster. For a comprehensive documentation check out the links in the [resources](#resources) such as the official snakemake documentation on readthedocs.
+This is a brief introduction to workflow management with snakemake aiming at getting you up and running with snakemake on the [Ibex](https://www.hpc.kaust.edu.sa/ibex) cluster. For a comprehensive documentation check out the links in the [resources](#resources) such as the official [snakemake documentation on readthedocs](https://snakemake.readthedocs.io/en/stable/).
 
 
-[[_TOC_]]
-
+## Table of Content
+- [Introduction](#introduction)
+- [Snakemake in short](#snakemake-in-short)
+- [A simple Snakemake workflow](#a-simple-snakemake-workflow)
+- [Separating code from configuration](#separating-code-from-configuration)
+- [File Organisation](#file-organisation)
+- [Wildcards](#wildcards)
+- [Protecting and removing files](#protecting-and-removing-files)
+- [CPU allocation](#cpu-allocation)
+- [Cluster configuration](#cluster-configuration)
+- [Modularity](#modularity)
+- [Snakemake Wrapper](#snakemake-wrapper)
+- [Anaconda package management in Snakemake](#anaconda-package-management-in-snakemake)
+- [Resources](#Resources)
 
 ## Introduction
 
@@ -15,7 +27,7 @@ This is a brief introduction to workflow management with snakemake aiming at get
 - sequencing requires many steps to get from the fastq file out of the sequencer to, e.g., a list of differentially expressed genes
 - let's look at a small example genome assembly workflow
 
-<img src="img/workflowSchema.jpeg"  width="30%" height="30%" >
+<img src="img/workflowSchema.jpeg"  width="40%" height="40%" >
 
 - the workflow can be broken down into separate steps, snakemake calles these `rules`
 - each rule defines how to obtain a defined output data type from a defined input data type
