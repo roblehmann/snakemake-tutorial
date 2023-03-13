@@ -1,0 +1,11 @@
+configfile: "config/config2.yaml"
+
+SAMPLES = {f.replace('R1.fq.gz','') for f in os.listdir(config["reads"]["path"]) if f.endswith("R1.fq.gz")}
+
+rule all:
+	input:
+		config["output"] + "calls/all.vcf"
+
+include: "rules/reference.smk"
+include: "rules/mapping.smk"
+include: "rules/variantCalling.smk"

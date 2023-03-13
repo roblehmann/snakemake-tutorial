@@ -1,0 +1,17 @@
+rule all:
+	input:
+              	"resources/ref/GCF_000005845.2_ASM584v2_genomic.fna"
+
+rule retrieve_ref:
+        output:
+               	"resources/ref/GCF_000005845.2_ASM584v2_genomic.fna.gz"
+        shell:
+              	"wget -P resources/ref/ ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz "
+
+rule uncompress_ref:
+        input:
+              	"resources/ref/GCF_000005845.2_ASM584v2_genomic.fna.gz"
+        output:
+               	"resources/ref/GCF_000005845.2_ASM584v2_genomic.fna"
+        shell:
+              	"gunzip {input}"

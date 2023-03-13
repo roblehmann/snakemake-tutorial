@@ -1,0 +1,72 @@
+configfile: "config/config2.yaml"
+
+SAMPLES = {f.replace('R1.fq.gz','') for f in os.listdir(config["reads"]["path"]) if f.endswith("R1.fq.gz")}
+
+rule all:
+	input:
+              	config["output"] + "calls/all.vcf"
+
+rule retrieve_ref:
+        output:
+               	config["reference"]["refPath"] + "GCF_000005845.2_ASM584v2_genomic.fna.gz"
+        params:
+            reflink = config["reference"]["refLink"],
+            path = config["reference"]["refPath"]
+        shell:
+              	"wget -P {params.path} {params.reflink} "
+
+rule uncompress_ref:
+        input:
+              	config["reference"]["refPath"] + "GCF_000005845.2_ASM584v2_genomic.fna.gz"
+        output:
+               	config["reference"]["refPath"] + "GCF_000005845.2_ASM584v2_genomic.fna"
+        shell:
+              	"gunzip {input}"
+
+rule bwa_index:
+    input:
+               	config["reference"]["refPath"] + "GCF_000005845.2_ASM584v2_genomic.fna"
+    output:
+          	multiext(config["reference"]["refPath"] + "GCF_000005845.2_ASM584v2_genomic.fna",".bwt",".sa",".amb",".ann",".pac")
+    shell:
+        "bwa index {input}"
+
+rule bwa_map:
+    input:
+        ref = config["reference"]["refPath"] + "GCF_000005845.2_ASM584v2_genomic.fna",
+        ind = config["reference"]["refPath"] + "GCF_000005845.2_ASM584v2_genomic.fna.bwt",
+        in1 = config["reads"]["path"] + "{sample}R1.fq.gz",
+        in2 = config["reads"]["path"] + "{sample}R2.fq.gz"
+    output:
+        config["output"] + "mapped_reads/{sample}.bam"
+    shell:
+        "bwa mem {input.ref} {input.in1} {input.in2} | samtools view -Sb - > {output}"
+
+
+rule samtools_sort:
+    input:
+        config["output"] + "mapped_reads/{sample}.bam"
+    output:
+        config["output"] + "sorted_reads/{sample}.bam"
+    shell:
+        "samtools sort -T sorted_reads/{wildcards.sample} "
+        "-O bam {input} > {output}"
+
+rule samtools_index:
+    input:
+        config["output"] + "sorted_reads/{sample}.bam"
+    output:
+        config["output"] + "sorted_reads/{sample}.bam.bai"
+    shell:
+        "samtools index {input}"
+
+rule bcftools_call:
+    input:
+        ref= config["reference"]["refPath"] + "GCF_000005845.2_ASM584v2_genomic.fna",
+        bam=expand(config["output"] + "sorted_reads/{sample}.bam", sample=SAMPLES),
+        bai=expand(config["output"] + "sorted_reads/{sample}.bam.bai", sample=SAMPLES)
+    output:
+        config["output"] + "calls/all.vcf"
+    shell:
+        "bcftools mpileup -f {input.ref} {input.bam} | "
+        "bcftools call -mv - > {output}"

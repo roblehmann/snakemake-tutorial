@@ -1,0 +1,23 @@
+configfile: "config/config.yaml"
+
+rule all:
+	input:
+              	config["reference"]["refPath"] + "GCF_000005845.2_ASM584v2_genomic.fna"
+
+rule retrieve_ref:
+        output:
+               	config["reference"]["refPath"] + "GCF_000005845.2_ASM584v2_genomic.fna.gz"
+        params:
+            reflink = config["reference"]["refLink"],
+            path = config["reference"]["refPath"]
+        shell:
+              	"wget -P {params.path} {params.reflink} "
+
+rule uncompress_ref:
+        input:
+              	config["reference"]["refPath"] + "GCF_000005845.2_ASM584v2_genomic.fna.gz"
+        output:
+               	config["reference"]["refPath"] + "GCF_000005845.2_ASM584v2_genomic.fna"
+        shell:
+              	"gunzip {input}"
+
